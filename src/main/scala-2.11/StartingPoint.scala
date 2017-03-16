@@ -15,7 +15,7 @@ object StartingPoint extends App {
 //  val sender2 = system.actorOf(Props(new Sender(store, 2)))
 //  val sender3 = system.actorOf(Props(new Sender(store, 3)))
 
-  val indexer = system.actorOf(Props(new SuperVisor()))
+  val indexer = system.actorOf(Props(new SuperVisor(system)))
   val pageParser = system.actorOf(Props(new PageParser(indexer)))
 
   val keyword = "senior java developer"
