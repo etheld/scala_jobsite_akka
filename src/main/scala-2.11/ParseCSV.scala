@@ -1,8 +1,6 @@
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 
-case class RawJobSpec(salary: String, location: String, description: String, url: String)
-
 case class JobSpec(salaryMin: Int, salaryMax: Int, location: String, keywords: List[String])
 
 object ParseCSV extends App {
@@ -14,7 +12,7 @@ object ParseCSV extends App {
   private val json = scala.io.Source.fromFile("c:\\Users\\gwelican-laptop\\jobs2.json").mkString
 
   private val specs = parse(json)
-    .extract[List[RawJobSpec]]
+    .extract[List[JobSpec]]
     .map(x =>
       x.copy(salary = x.salary
         .replace(",000.00", "k")
