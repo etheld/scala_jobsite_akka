@@ -10,3 +10,4 @@ libraryDependencies += "commons-validator" % "commons-validator" % "1.6"
 libraryDependencies += "org.jsoup" % "jsoup" % "1.10.2"
 libraryDependencies += "org.json4s" %% "json4s-jackson" % "3.5.0"
 
+
