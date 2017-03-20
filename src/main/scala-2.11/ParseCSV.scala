@@ -1,3 +1,5 @@
+import java.io.{BufferedWriter, FileWriter}
+
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 
@@ -9,7 +11,7 @@ object ParseCSV extends App {
   val fixRegex = ".*?(\\d+[kK]?\\s*(PA|pa|per)*).*?".r
   val rangeRegex = ".*?(\\d+)[kK]?\\s*-\\s*(\\d+)[kK]?.*?".r
 
-  private val json = scala.io.Source.fromFile("c:\\Users\\gwelican-laptop\\jobs2.json").mkString
+  private val json = scala.io.Source.fromFile("/Users/peter.varsanyi/Downloads/jobs2.json").mkString
 
   def convertToParsedJobs(x: JobSpec): ParsedJobSpec = {
     if (rangeRegex.pattern.matcher(x.salary).matches()) {
@@ -45,12 +47,16 @@ object ParseCSV extends App {
     .map(x => if (x.salaryMedian > 15000) x.copy(salaryMax = x.salaryMax / 1000, salaryMin = x.salaryMin / 1000, salaryMedian = x.salaryMedian / 1000) else x)
 
 
-  //  specs
-  //    .filter(_.description.contains("scala"))
-  //    .filter(_.location.toLowerCase.contains("london"))
-  //    .sortBy(_.salaryMedian)
-
-  //    .foreach(println)
+//  specs.
+//    flatMap(_.description.split("\\W")).
+//    foldLeft(Map.empty[String, Int]) {
+//      (count, word) => count + (word -> (count.getOrElse(word, 0) + 1))
+//    }
+//
+//  specs
+//    .sortBy(_.salaryMedian)
+//    .foreach(x => println(x.salaryMedian, x.salaryMin, x.salaryMax, x.description, x.url))
+  //  .foreach(println)
 
   var nonKeywordWords = Array[String]("and", "to", "the", "of", "in", "for", "with", "will", "developer", "a", "an", "on", "be", "are", "you", "team",
     "software", "apply", "have", "working", "skills", "experience", "this", "development", "as", "now", "role", "your", "their", "company",
@@ -81,6 +87,22 @@ object ParseCSV extends App {
 
   //  println(specs.map(_.salaryMedian).sum / specs.size)
   //  println(specs.size)
+
+//  specs.writeCSVToFileName("jobs.csv", header=Some(Seq("salaryMin","salaryMax","salaryMedian","location","description")))
+  val w = new BufferedWriter(new FileWriter("jobs_filtered.json"))
+  val jsonExport = org.json4s.jackson.Serialization.writePretty(specs)
+
+  w.write(jsonExport)
+  w.close()
+
+
+//  Seq(specs).writeCSVToFileName("/tmp/example.csv", header=Some(Seq("salaryMin","salaryMax","salaryMedian","location","description")))
+//  scala.io.Source.fromFile("/tmp/example.csv").getLines.toList
+
+
+
+//  println(specs.map(_.salaryMedian).sum / specs.size)
+//  println(specs.size)
 
   //  val x = ""
   //  x.replace(",000", "k")
