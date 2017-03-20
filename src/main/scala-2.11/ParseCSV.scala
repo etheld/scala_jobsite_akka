@@ -1,3 +1,5 @@
+import java.io.{BufferedWriter, FileWriter}
+
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 
@@ -45,19 +47,33 @@ object ParseCSV extends App {
 //    .map(x => if (x.salaryMedian > 15000) x.copy(salaryMax = x.salaryMax / 1000, salaryMin = x.salaryMin / 1000, salaryMedian = x.salaryMedian / 1000) else x)
 
 
-  specs.
-    flatMap(_.description.split("\\W")).
+//  specs.
+//    flatMap(_.description.split("\\W")).
 //    foldLeft(Map.empty[String, Int]) {
 //      (count, word) => count + (word -> (count.getOrElse(word, 0) + 1))
 //    }
-
-  specs
-    .sortBy(_.salaryMedian)
-    .foreach(x => println(x.salaryMedian, x.salaryMin, x.salaryMax, x.description, x.url))
+//
+//  specs
+//    .sortBy(_.salaryMedian)
+//    .foreach(x => println(x.salaryMedian, x.salaryMin, x.salaryMax, x.description, x.url))
   //  .foreach(println)
 
-  println(specs.map(_.salaryMedian).sum / specs.size)
-  println(specs.size)
+
+//  specs.writeCSVToFileName("jobs.csv", header=Some(Seq("salaryMin","salaryMax","salaryMedian","location","description")))
+  val w = new BufferedWriter(new FileWriter("jobs_filtered.json"))
+  val jsonExport = org.json4s.jackson.Serialization.writePretty(specs)
+
+  w.write(jsonExport)
+  w.close()
+
+
+//  Seq(specs).writeCSVToFileName("/tmp/example.csv", header=Some(Seq("salaryMin","salaryMax","salaryMedian","location","description")))
+//  scala.io.Source.fromFile("/tmp/example.csv").getLines.toList
+
+
+
+//  println(specs.map(_.salaryMedian).sum / specs.size)
+//  println(specs.size)
 
   //  val x = ""
   //  x.replace(",000", "k")
