@@ -1,5 +1,8 @@
 import java.io.{BufferedWriter, FileWriter}
 
+import org.apache.spark.ml.feature.{HashingTF, IDF, Tokenizer}
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 
@@ -36,7 +39,7 @@ object ParseCSV extends App {
         .replace("0000", "0k")
         .replace("000", "k")
         .replace("£", "")
-        .replace(",", "")
+        .replace(",","")
       )
     )
     .filter(x => rangeRegex.pattern.matcher(x.salary).matches())
@@ -47,16 +50,15 @@ object ParseCSV extends App {
     .map(x => if (x.salaryMedian > 15000) x.copy(salaryMax = x.salaryMax / 1000, salaryMin = x.salaryMin / 1000, salaryMedian = x.salaryMedian / 1000) else x)
 
 
-//  specs.
-//    flatMap(_.description.split("\\W")).
-//    foldLeft(Map.empty[String, Int]) {
-//      (count, word) => count + (word -> (count.getOrElse(word, 0) + 1))
-//    }
-//
+  specs.
+    flatMap(_.description.split("\\W")).
+    foldLeft(Map.empty[String, Int]) {
+      (count, word) => count + (word -> (count.getOrElse(word, 0) + 1))
+    }
+
 //  specs
 //    .sortBy(_.salaryMedian)
 //    .foreach(x => println(x.salaryMedian, x.salaryMin, x.salaryMax, x.description, x.url))
-  //  .foreach(println)
 
   var nonKeywordWords = Array[String]("and", "to", "the", "of", "in", "for", "with", "will", "developer", "a", "an", "on", "be", "are", "you", "team",
     "software", "apply", "have", "working", "skills", "experience", "this", "development", "as", "now", "role", "your", "their", "company",
@@ -95,26 +97,39 @@ object ParseCSV extends App {
   w.write(jsonExport)
   w.close()
 
+  val session = SparkSession.builder()
+    .appName("bela")
+    .master("local[2]")
+    .getOrCreate()
 
-//  Seq(specs).writeCSVToFileName("/tmp/example.csv", header=Some(Seq("salaryMin","salaryMax","salaryMedian","location","description")))
-//  scala.io.Source.fromFile("/tmp/example.csv").getLines.toList
-
-
-
-//  println(specs.map(_.salaryMedian).sum / specs.size)
-//  println(specs.size)
-
-  //  val x = ""
-  //  x.replace(",000", "k")
+  val file = "build.sbt"
+  val documents: RDD[Seq[String]] = session.sparkContext.textFile(file).map(_.split(" ").toSeq)
+  print("Documents Size:" + documents.count)
 
 
-  //  specs
+  //  private val rdd: RDD[Seq[String]] = session.sparkContext.parallelize(specs.map(_.description.split(" ").toSeq))
+  ////  val documents: RDD[Seq[String]] = session.sparkContext.textFile("data/mllib/kmeans_data.txt")
+  ////    .map(_.split(" ").toSeq)
+  //
+  //  val hashingTF = new HashingTF()
+  //  val tf: RDD[Vector] = hashingTF.transform(rdd)
+  //
+  //  rdd.foreach(hashingTF.transform(_))
+  //
+  ////  for(tf_ <- tf) {
+  ////    println(s"$tf_")
+  ////  }
+  //
+  //
+  //  tf.cache()
+  //  val idf = new IDF().fit(tf)
+  //  val tfidf: RDD[Vector] = idf.transform(tf)
+  //
+  //  for(tfidf_ <- tfidf) {
+  //    println(s"$tfidf_")
+  //  }
+  //
+  //  val idfIgnore = new IDF(minDocFreq = 2).fit(tf)
+  //  val tfidfIgnore: RDD[Vector] = idfIgnore.transform(tf)
 
-  //  val regex = """^([a-zA-Z]\d{6})""".r // enables you to drop escaping \'s
-
-  //  specs.filter(_.salary)
-
-  //  val json = try {  parse(stream) } finally { stream.close() }
-
-  //  Serialization.read[JobSpec]("")
 }
